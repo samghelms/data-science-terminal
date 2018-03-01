@@ -1,23 +1,23 @@
 import BaseComponent from '../../common/baseComponent'
+import {components} from '../'
 
 export default class Pane extends BaseComponent {
-	constructor(args, id) {
-		super(args)
-		this.id = id
-		this.el = document.createElement('div')
-		this.el.id = this.id
-		this.el.className = "pane"
+	constructor(t) {
+		super(t)
+		this._el = document.createElement('div')
+		this._el.id = this._id
+		this._el.className = this.name
+		this._el.style.width = "500px"
+		this._el.style.height = "500px"
 	}
 
 	contents() {
-		return this.el
+		return this._el
 	}
 
-	append(otherEl) {
-		this.el.appendChild(otherEl)
-	}
-
-	compose(children) {
-		// TODO: add methods to pass hotkeys and styles down
+	compose(child) {
+		const childOb = components(child)
+		this._el.appendChild(childOb.content())
+		return childOb
     }
 }

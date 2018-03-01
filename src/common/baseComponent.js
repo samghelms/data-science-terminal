@@ -3,8 +3,10 @@
  * Interface for components
  */
 export default class BaseComponent {
-	constructor(args) {
-
+	constructor(t) {
+		const {children, name} = t
+		this.children = children
+		this.name = name
 	}
 	append() {
 		throw new Error('Pure method, you must implement this in your derived class');

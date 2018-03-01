@@ -6,23 +6,15 @@
 // import appStore from './reducers'
 // import App from './App'
 import Pane from './components/pane'
-// import Xterm from './components/xterm'
+import Shell from './components/shell'
 import AceEditor from './components/aceEditor'
 import {componentTypes, components } from './components'
 
-require('events').EventEmitter.prototype._maxListeners = 100;
+require('events').EventEmitter.prototype._maxListeners = 1000;
 
-class State {
-	constructor(type, children, args) {
-		this.type = type
-		this.children = children
-		this.args = args
-	}
-}
-
-const term = new State(componentTypes.xterm, [], {})
-const shell = new State(componentTypes.shell, [term], {})
-const startState = new State(componentTypes.pane, [shell], {})
+// const term = new State(componentTypes.xterm, [], {})
+// const shell = new State(componentTypes.shell, [], {})
+// const startState = new State(componentTypes.pane, [shell], {})
 
 /**
  * destructively builds the layout tree
@@ -30,17 +22,39 @@ const startState = new State(componentTypes.pane, [shell], {})
  * @param  {[type]} components [description]
  * @return {[type]}            [description]
  */
-const buildTree = (cur, components, parent, id) => {
-	let _cur = components[cur.type](cur.args, id)
-	parent.appendChild(_cur.contents())
+const buildTree = (parent) => {
 	let i = 0
-	for(let child of cur.children) {
-		buildTree(child, components, _cur.contents(), id+i.toString())
-		i++
+	for(let i = 0; i < parent.children.length; i++) {
+		const child = parent.children[i]
+		const childObj = parent.compose(child)
+		buildTree(childObj)
 	}
-	_cur.compose(cur.children)
 }
 
-let appRoot = document.getElementById('app')
-buildTree(startState, components, appRoot, "0")
+const startState = 	{
+						name: componentTypes.root,
+						args: {domID: "app"},
+						children: [
+							{
+								name: componentTypes.pane,
+								args: {},
+								children: [
+									{
+										name: componentTypes.shell,
+										args: {focused: componentTypes.xterm},
+										children: [
+											{
+												name: componentTypes.myterm,
+												args: {},
+												children: []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+
+const appRoot = document.getElementById('app')
+buildTree(components(startState))
 console.log(appRoot)

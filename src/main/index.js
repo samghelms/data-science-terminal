@@ -9,36 +9,37 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 // global reference to mainWindow (necessary to prevent window from being garbage collected)
 let mainWindow
 
-function createMainWindow() {
-  const window = new BrowserWindow()
-
+function createMainWindow () {
+  let win = new BrowserWindow({opacity: 0.5})
+  console.log("title?")
+  console.log(win.getTitle())
   if (isDevelopment) {
-    window.webContents.openDevTools()
+    win.webContents.openDevTools()
   }
 
   if (isDevelopment) {
-    window.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`)
+    win.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`)
   }
   else {
-    window.loadURL(formatUrl({
+    win.loadURL(formatUrl({
       pathname: path.join(__dirname, 'index.html'),
       protocol: 'file',
       slashes: true
     }))
   }
 
-  window.on('closed', () => {
+  win.on('closed', () => {
     mainWindow = null
   })
 
-  window.webContents.on('devtools-opened', () => {
-    window.focus()
+  win.webContents.on('devtools-opened', () => {
+    win.focus()
     setImmediate(() => {
-      window.focus()
+      win.focus()
     })
   })
 
-  return window
+  return win
 }
 
 // quit application when all windows are closed
